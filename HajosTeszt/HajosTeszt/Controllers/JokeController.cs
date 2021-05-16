@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using HajosTeszt.JokeModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -9,83 +10,53 @@ namespace HajosTeszt.Controllers
 {
     [Route("api/jokes")]
     [ApiController]
-
-
     public class JokeController : Controller
     {
-        // GET: JokeController
-        public ActionResult Index()
+        // GET: api/jokes
+        [HttpGet]
+        public IEnumerable<Joke> Get()
         {
-            return View();
+            FunnyDatabaseContext context = new FunnyDatabaseContext();
+            return context.Jokes.ToList();
         }
 
-        // GET: JokeController/Details/5
-        public ActionResult Details(int id)
+        // GET api/jokes/5
+        [HttpGet("{id}")]
+        public Joke Get(int id)
         {
-            return View();
+            FunnyDatabaseContext context = new FunnyDatabaseContext();
+            var keresettVicc = (from x in context.Jokes
+                                where x.JokeSk == id
+                                select x).FirstOrDefault();
+            return keresettVicc;
         }
 
-        // GET: JokeController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: JokeController/Create
+        // POST api/jokes
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public void Post([FromBody] Joke újvicc)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            FunnyDatabaseContext context = new FunnyDatabaseContext();
+            context.Jokes.Add(újvicc);
+            context.SaveChanges();
         }
 
-        // GET: JokeController/Edit/5
-        public ActionResult Edit(int id)
+        // PUT api/<JokeController>/5
+        [HttpPut("{id}")]
+        public void Put(int id, [FromBody] string value)
         {
-            return View();
         }
 
-        // POST: JokeController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        // DELETE api/jokes/5
+        [HttpDelete("{id}")]
+        public void Delete(int id)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+            FunnyDatabaseContext context = new FunnyDatabaseContext();
+            var törlendőVicc = (from x in context.Jokes
+                                where x.JokeSk == id
+                                select x).FirstOrDefault();
+            context.Remove(törlendőVicc);
+            context.SaveChanges();
 
-        // GET: JokeController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: JokeController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
         }
     }
 }
